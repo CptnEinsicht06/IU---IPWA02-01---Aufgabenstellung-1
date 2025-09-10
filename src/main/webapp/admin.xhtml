@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<!-- Optionaler Guard: nur Admin darf hierher -->
+<f:metadata>
+    <f:viewAction action="#{loginUser.guardAdmin}" onPostback="false"/>
+</f:metadata>
+
+<h:head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin · Änderungen prüfen</title>
+    <style>
+        :root{--bg:#f6f4ea;--card:#ffffff;--text:#1f2937;--muted:#475569;--green:#2e7d32;--green-dark:#1b5e20;--border:#e5e7eb;--red:#b91c1c;--red-dark:#991b1b;}
+        *{box-sizing:border-box}
+        body{margin:0;background:var(--bg);color:var(--text);
+            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Ubuntu,"Helvetica Neue",Arial,sans-serif;}
+        header{background:linear-gradient(135deg,#eaf6ea,#e8f3e0 60%);border-bottom:1px solid var(--border)}
+        .container{max-width:1100px;margin:0 auto;padding:0 16px}
+        .topbar{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;min-height:76px}
+        .brand{display:flex;align-items:center;gap:12px;font-weight:700}
+        .brand-title{font-size:18px;color:var(--green-dark)}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin:24px auto;
+            box-shadow:0 10px 24px rgba(0,0,0,.06)}
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top; text-align:left;}
+        th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#0f5132}
+        td{font-size:14px}
+        tbody tr:hover{background:#f3faf3}
+        .right{display:flex;gap:10px;justify-content:flex-end}
+        .btn{background:var(--green);color:#fff;border:none;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer}
+        .btn:hover{background:var(--green-dark)}
+        .btn-delete{ background:var(--red); }
+        .btn-delete:hover{ background:var(--red-dark); }
+        footer{color:#64748b;font-size:12px;padding:18px 0 32px;border-top:1px solid var(--border);margin-top:24px}
+        input[type="text"]{border:1px solid var(--border);border-radius:8px;padding:6px 8px}
+
+        /* Header und Footer in dunkelgrün */
+        :root { --header-green: #206a2b; }   /* etwas dunkler als dein aktuelles Grün */
+        header{
+            background: var(--header-green);   /* statt des hellen Verlaufs */
+            border-bottom: none;
+        }
+        header .brand-title{ color:#fff; }
+        header a, header nav a{ color:#fff; opacity:1; text-decoration:none; }
+        header nav a:hover{ text-decoration:underline; color:#fff; }
+
+        footer{
+            background: var(--header-green);
+            color:#fff; border-top:none;
+        }
+        footer a{ color:#fff; text-decoration:underline; }
+
+        /* Footer immer ganz unten (Sticky Footer) */
+        html, body { height: 100%; }
+        body{
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main{ flex: 1 0 auto; }
+        footer{ margin-top: auto; }
+    </style>
+</h:head>
+
+<h:body>
+    <header>
+        <div class="container">
+            <div class="topbar">
+                <div class="brand">
+                    <a href="index.xhtml" style="display:inline-flex;align-items:center">
+                        <img src="Logo.png" width="60" alt="Logo"/>
+                    </a>
+                    <div class="brand-title">From Zero To Hero · Admin</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <h2>Änderungen prüfen</h2>
+
+            <h:form id="adminForm">
+                <h:dataTable value="#{adminApproval.pending}" var="row" rendered="#{not empty adminApproval.pending}">
+                    <h:column>
+                        <f:facet name="header">Change ID</f:facet>
+                        #{row.id}
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">Land</f:facet>
+                        <!-- Zugriff über Relation 'emission' -->
+                        #{row.emission.land} (#{row.emission.landCode})
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">1990</f:facet>
+                        #{row.new1990}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">2000</f:facet>
+                        #{row.new2000}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">2010</f:facet>
+                        #{row.new2010}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">2020</f:facet>
+                        #{row.new2020}
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">Eingereicht von</f:facet>
+                        #{row.proposer}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Eingereicht am</f:facet>
+                        #{row.createdAt}
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">Aktion</f:facet>
+                        <div class="right">
+                            <h:commandButton styleClass="btn" value="Bestätigen"
+                                             action="#{adminApproval.approve(row.id)}">
+                                <f:ajax render="@form" />
+                            </h:commandButton>
+                            <h:commandButton styleClass="btn btn-delete" value="Ablehnen"
+                                             action="#{adminApproval.reject(row.id)}">
+                                <f:ajax render="@form" />
+                            </h:commandButton>
+                        </div>
+                    </h:column>
+                </h:dataTable>
+
+                <h:panelGroup rendered="#{empty adminApproval.pending}">
+                    <div style="color:#64748b">Keine offenen Änderungen.</div>
+                </h:panelGroup>
+            </h:form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            © Dennis Schloss - Matrikelnummer: 32110836 ·
+            <a href="imprint.html">Impressum</a> · <a href="privacy.html">Datenschutz</a>
+        </div>
+    </footer>
+</h:body>
+</html>
+
+

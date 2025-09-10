@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<!-- optional: nur Editor sichtbar, wenn Rolle passt -->
+<f:metadata>
+    <f:viewAction action="#{loginUser.guardEditor}" onPostback="false"/>
+</f:metadata>
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>From Zero To Hero · Dateneditor</title>
+    <style>
+        :root{
+            --bg:#f6f4ea;--card:#ffffff;--text:#1f2937;--muted:#475569;
+            --green:#2e7d32;--green-dark:#1b5e20;--border:#e5e7eb;
+            --red:#b91c1c;--red-dark:#991b1b; /* NEU für Logout */
+        }
+        *{box-sizing:border-box}
+        body{margin:0;background:var(--bg);color:var(--text);
+            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Ubuntu,"Helvetica Neue",Arial,sans-serif}
+        header{background:linear-gradient(135deg,#eaf6ea,#e8f3e0 60%);border-bottom:1px solid var(--border)}
+        .container{max-width:1100px;margin:0 auto;padding:0 16px}
+        .topbar{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;min-height:76px}
+        .brand{display:flex;align-items:center;gap:12px;font-weight:700}
+        .brand-title{font-size:18px;color:var(--green-dark)}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin:24px auto;max-width:1100px;
+            box-shadow:0 10px 24px rgba(0,0,0,.06)}
+        label{font-size:13px;color:var(--muted)}
+        input, select{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:15px;margin-top:6px}
+        .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .btn{background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+        .btn:hover{background:var(--green-dark)}
+        .btn-danger{background:var(--red)}            /* NEU */
+        .btn-danger:hover{background:var(--red-dark)} /* NEU */
+        /* Button-Zeile: 3/4 vs. 1/4 */
+        .actions{display:grid;grid-template-columns:3fr 1fr;gap:14px;margin-top:14px}
+        .actions .btn{width:100%}
+        /* mobil: untereinander */
+        @media (max-width:720px){ .actions{grid-template-columns:1fr} }
+        .muted{color:#64748b}
+        footer{color:#64748b;font-size:12px;padding:18px 0 32px;border-top:1px solid var(--border);margin-top:24px}
+
+        /* Header und Footer in dunkelgrün */
+        :root { --header-green: #206a2b; }   /* etwas dunkler als dein aktuelles Grün */
+        header{
+            background: var(--header-green);   /* statt des hellen Verlaufs */
+            border-bottom: none;
+        }
+        header .brand-title{ color:#fff; }
+        header a, header nav a{ color:#fff; opacity:1; text-decoration:none; }
+        header nav a:hover{ text-decoration:underline; color:#fff; }
+
+        footer{
+            background: var(--header-green);
+            color:#fff; border-top:none;
+        }
+        footer a{ color:#fff; text-decoration:underline; }
+
+        /* Footer immer ganz unten (Sticky Footer) */
+        html, body { height: 100%; }
+        body{
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main{ flex: 1 0 auto; }
+        footer{ margin-top: auto; }
+    </style>
+</h:head>
+
+<h:body>
+    <header>
+        <div class="container">
+            <div class="topbar">
+                <div class="brand">
+                    <a href="index.xhtml" style="display:inline-flex;align-items:center">
+                        <img src="Logo.png" width="60" alt="Logo"/>
+                    </a>
+                    <div class="brand-title">From Zero To Hero · Dateneditor</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <h2>Emissionen bearbeiten</h2>
+            <h:form id="editForm">
+                <div class="row">
+                    <div>
+                        <label for="country">Land wählen</label>
+                        <h:selectOneMenu id="country" value="#{emEdit.selectedId}">
+                            <f:selectItem itemLabel="– bitte wählen –" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{emEdit.options}"/>
+                        </h:selectOneMenu>
+                    </div>
+                    <div style="display:flex;align-items:end">
+                        <h:commandButton styleClass="btn" value="Datensatz laden" action="#{emEdit.loadRow}">
+                            <f:ajax execute="@form" render="editForm:fields editForm:msg"/>
+                        </h:commandButton>
+                    </div>
+                </div>
+
+                <h:panelGroup id="fields">
+                    <div class="row" style="margin-top:14px">
+                        <div>
+                            <label for="e1990">Emissionen 1990 (in kt)</label>
+                            <h:inputText id="e1990" value="#{emEdit.emission1990}"><f:convertNumber type="number"/></h:inputText>
+                        </div>
+                        <div>
+                            <label for="e2000">Emissionen 2000 (in kt)</label>
+                            <h:inputText id="e2000" value="#{emEdit.emission2000}"><f:convertNumber type="number"/></h:inputText>
+                        </div>
+                        <div>
+                            <label for="e2010">Emissionen 2010 (in kt)</label>
+                            <h:inputText id="e2010" value="#{emEdit.emission2010}"><f:convertNumber type="number"/></h:inputText>
+                        </div>
+                        <div>
+                            <label for="e2020">Emissionen 2020 (in kt)</label>
+                            <h:inputText id="e2020" value="#{emEdit.emission2020}"><f:convertNumber type="number"/></h:inputText>
+                        </div>
+                    </div>
+
+                    <!-- NEU: Button-Reihe 3/4 : 1/4 -->
+                    <div class="actions">
+                        <h:commandButton styleClass="btn" value="Speichern" action="#{emEdit.save}">
+                            <f:ajax execute="@form" render="editForm:msg"/>
+                        </h:commandButton>
+
+                        <!-- Logout als roter Button, volle Navigation (kein f:ajax) -->
+                        <h:commandButton styleClass="btn btn-danger" value="Logout" action="#{loginUser.logout}"/>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup id="msg" style="margin-top:10px">
+                    <h:outputText styleClass="muted" value="#{emEdit.message}" rendered="#{not empty emEdit.message}"/>
+                </h:panelGroup>
+            </h:form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            © Dennis Schloss · Matrikelnummer: 32110836 ·
+            <a href="imprint.html">Impressum</a> · <a href="privacy.html">Datenschutz</a>
+        </div>
+    </footer>
+</h:body>
+</html>
+
